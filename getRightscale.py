@@ -5,6 +5,7 @@
 
 import os
 import sys
+import urllib2
 from optparse import OptionParser
 
 
@@ -12,7 +13,7 @@ from optparse import OptionParser
 COOKIES_NAME = os.path.join(os.getenv('HOME'), ".rsCookies")
 #ACCOUNT_ID = 22329
 API_VERSION = 1.0
-API_VERSION_HEADER = "X-API-VERSION:%(version)s" % {'version': API_VERSION}
+API_VERSION_HEADER = "X-API-VERSION:%(ver)s" % {'ver': API_VERSION}
 API_BASEURI = "https://my.rightscale.com/api/acct"
 FORMAT = "js"
 
@@ -21,8 +22,8 @@ def _optparse():
     """OptionParserを生成し、パラメータを設定する
     """
     parser = OptionParser()
-    parser.add_option("-a", "--account-id", dest="account",
-        help="RightScale account")
+    parser.add_option("-a", "--account", dest="accountid",
+        help="RightScale account id")
     parser.add_option("-u", "--username", dest="username",
         help="Rightscale username")
     parser.add_option("-p", "--password", dest="password",
@@ -37,8 +38,25 @@ def _optparse():
 
 def _is_cookie():
     if COOKIES_NAME:
-        sys.stderr.write(
-            "Cannot read cookie!! execute $0 getcookies...")
+        return True
+    else:
+        return None
+
+
+#def get_servers(options, filter=None):
+#    """インスタンス一覧を取得する
+#    """
+#    if _is_cookie():
+#        sys.stderr.write(
+#            "Cannot read cookie!! execute $0 getcookies...")
+#        sys.exit(1)
+#
+#    _api = "%(base)s/%(acct)s/servers" % {'base': API_BASEURI,
+#        'acct': options.account}
+#    if filter:
+#        _api += "?filter=%(fil)s" % {'fil': filter}
+#
+#    auth_handler = urllib2.AbstractBasicAuthHandler()
 
 #servers() {
 #  _iscookies || (usage; exit 1)
