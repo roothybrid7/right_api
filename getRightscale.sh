@@ -16,28 +16,28 @@ usage() {
   echo "Defined funtions:"
 
 cat <<_END_OF_STRING
-    -a accountid: Rightscale's Account id
-    get_cookie:
+    -a accountid : Rightscale's Account id
+    get_cookie :
         Use basic authentication to get the cookie and store it in the cookie jar.
 
         command: $0 get_cookie:username,[password]
-            username: Rightscale's username(required)
-            password: user's password (optional)
+            username : Rightscale's username(required)
+            password : user's password (optional)
 
-    servers:
+    servers :
         Find a specific server based on a <param>(<name>=<value>).
 
-        command: $0 servers:[<name>=<value>]
-            <param>: Rightscale's parameter(optional)
+        command : $0 servers:[<name>=<value>]
+            <param> : Rightscale's parameter(optional)
 
-    actions:
+    actions :
         in order to perform actions on the server.
 
-        command: $0 actions:<action>=<href>
-            <action>: perform action[ex: start, stop](required)
-            <href>: server's <href> tag[see XML Output: $0 servers ...](required)
+        command : $0 actions:<action>=<href>
+            <action> : perform action[ex: start, stop](required)
+            <href> : server's <href> tag[see XML Output: $0 servers ...](required)
 
-    usage:
+    usage :
         print usage
 _END_OF_STRING
 } 1>&2
