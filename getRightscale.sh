@@ -6,7 +6,7 @@
 readonly COOKIES_NAME="${HOME}/.rsCookies"
 readonly API_VERSION=1.0
 readonly API_VERSION_HEADER="X-API-VERSION:${API_VERSION}"
-readonly API_BASEURI="https://my.rightscale.com/api/acct/"
+readonly API_BASEURI="https://my.rightscale.com/api/acct"
 readonly FORMAT="js"
 ACCOUNT_ID=
 
@@ -56,7 +56,7 @@ _is_cookie() {
 servers() {
   _is_cookie || _terminate $FUNCNAME "##### Cannot read cookie!! execute $0 getcookies... #####"
 
-  local api="${API_BASEURI}/servers"
+  local api="${API_BASEURI}/${ACCOUNT_ID}/servers"
   [ $# -ne 0 ] && api="${api}?filter=${1}"
 
   curl -H $API_VERSION_HEADER -b $COOKIES_NAME $api
@@ -78,7 +78,7 @@ actions() {
 get_cookie() {
   [ -z "$1" ] && _terminate $FUNCNAME "##### Input Rightscale's username!! #####"
 
-  local api="${API_BASEURI}/login"
+  local api="${API_BASEURI}/${ACCOUNT_ID}/login"
   local userpass
   [ -n "$2" ] && userpass=$1:$2 || userpass=$1
 
