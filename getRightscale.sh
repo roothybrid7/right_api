@@ -17,10 +17,10 @@ usage() {
 
 cat <<_END_OF_STRING
     -a accountid : Rightscale's Account id
-    get_cookie :
+    login :
         Use basic authentication to get the cookie and store it in the cookie jar.
 
-        command: $0 get_cookie:username,[password]
+        command: $0 login:username,[password]
             username : Rightscale's username(required)
             password : user's password (optional)
 
@@ -75,7 +75,7 @@ actions() {
   return $?
 }
 
-get_cookie() {
+login() {
   [ -z "$1" ] && _terminate $FUNCNAME "##### Input Rightscale's username!! #####"
 
   local api="${API_BASEURI}/${ACCOUNT_ID}/login"
