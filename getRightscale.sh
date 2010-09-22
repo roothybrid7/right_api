@@ -4,18 +4,19 @@
 
 # Declaration of variables
 readonly COOKIES_NAME="${HOME}/.rsCookies"
-readonly ACCOUNT_ID=22329
 readonly API_VERSION=1.0
 readonly API_VERSION_HEADER="X-API-VERSION:${API_VERSION}"
-readonly API_BASEURI="https://my.rightscale.com/api/acct/${ACCOUNT_ID}"
+readonly API_BASEURI="https://my.rightscale.com/api/acct/"
 readonly FORMAT="js"
+ACCOUNT_ID=
 
 usage() {
-  echo "Usage: $0 <funcname1[:opt1[=val1],opts2[=val2]] funcname2[:opt1[=val1],opt2[=val2]] ...>"
+  echo "Usage: $0 -a <accountid> <funcname1[:opt1[=val1],opts2[=val2]] funcname2[:opt1[=val1],opt2[=val2]] ...>"
   echo
   echo "Defined funtions:"
 
 cat <<_END_OF_STRING
+    -a accountid: Rightscale's Account id
     get_cookie:
         Use basic authentication to get the cookie and store it in the cookie jar.
 
@@ -42,7 +43,7 @@ _END_OF_STRING
 } 1>&2
 
 _terminate() {
-  echo "${1}: $2" 1>&2
+  [ $# -gt 1 ] && echo "${1}: $2" 1>&2
   echo 1>&2
   usage
   exit 1
@@ -100,4 +101,14 @@ main() {
 }
 
 # Entry point
+while getopts a: OPT
+do
+  case $OPT in
+    "a") ACCOUNT_ID="$OPTARG";;
+    *) _terminate
+  esac
+done
+shift $(($OPTIND - 1))
+[ -z "$ACCOUNT_ID" ] && _terminate "CHECK_OPTIONS" "##### REQUIRED ACCOUNT_ID!! #####"
+
 main $@
