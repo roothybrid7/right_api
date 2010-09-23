@@ -155,9 +155,9 @@ actions() {
 
 shell() {
   echo "Setting up shell [Press 'q' or 'quit' to exit]" 1>&2
-  local _key=
   while :
   do
+    local _key=
     echo -n ">> " 1>&2
     read _key
     # press "exit ", "q" or "quit"
@@ -174,9 +174,7 @@ shell() {
 }
 
 main() {
-  if [ $# -eq 0 ]; then
-    login || exit 1
-  fi
+  [ $# -eq 0 ] && exit 1  # No arguments
   [ "$1" == "shell" ] && shell  # run shell
 
   # execute from command line
@@ -189,12 +187,12 @@ main() {
     local _func=${_lines[$cnt]}
     local _args=
 
-    # check arguments
+    # check next argument
     ((cnt++))
     case "${_lines[$cnt]}" in
-      # is function?
+      # argument is function?
       "login" | "servers" | "actions") ;;  # keep position
-      # is not function?
+      # argument is not function?
       *)
         _args=${_lines[$cnt]}
         ((cnt++)) # next argument
@@ -213,19 +211,10 @@ if [ $# -ne 0 ]; then
   while getopts a:hu:p: OPT
   do
     case $OPT in
-      "a")
-        account_id="$OPTARG"
-        ;;
-      "h")
-        _usage
-        exit 0
-        ;;
-      "u")
-        username="$OPTARG"
-        ;;
-      "p")
-        password="$OPTARG"
-        ;;
+      "a") account_id="$OPTARG";;
+      "h") _usage; exit 0;;
+      "u") username="$OPTARG";;
+      "p") password="$OPTARG";;
       *) ;;
     esac
   done
