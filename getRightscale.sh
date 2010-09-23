@@ -20,16 +20,28 @@ Usage: $0 [options] [functions]
   Options:
     -a <account_id> : Rightscale's Account id(required)
     -h : print this help message and exit
-    -u <username> : Rightscale's username
-    -p <password> : user password
+    -u <username> : Rightscale's username(use login)
+    -p <password> : user password(optional)
 
   Defined funtions:
+    login :
+      Use basic authentication to get session and store it.
+
 _END_OF_USAGE
   fi
 
   if [ $# -ne 0 ]; then
     cat <<_END_OF_USAGE
-    account :
+    help :
+        print this help message
+
+    login <username> :
+      Use basic authentication to get session and store it.
+
+        arguments : <username>
+            <username> : Rightscale's username(required)
+
+    account <account_id> :
       Set Rightscale's Account id.
 
         arguments : <account_id>
@@ -38,35 +50,20 @@ _END_OF_USAGE
 _END_OF_USAGE
   fi
 
-cat <<_END_OF_STRING
-    login :
-        Use basic authentication to get session and store it.
-
-        arguments : <username>,[<password>]
-            <username> : Rightscale's username(required)
-            <password> : user's password (optional)
-
-    servers :
+  cat <<_END_OF_USAGE
+    servers [<filter>] :
         Find a specific server based on a filter(<key>=<value>).
 
         arguments : [<key>=<value>](filter)
             <filter> : Rightscale's parameter(optional)
 
-    actions :
+    actions <actions> :
         in order to perform actions on the server.
 
-        arguments : <action>=<href>
+        arguments : <action>=<href>(actions)
             <action> : perform action[ex: start, stop](required)
             <href> : server's <href> tag[execute function 'servers': see XML Output](required)
-_END_OF_STRING
-
-  if [ $# -ne 0 ]; then
-cat <<_END_OF_STRING
-
-    help :
-        print this help message
-_END_OF_STRING
-  fi
+_END_OF_USAGE
 } 1>&2
 
 _help() {
