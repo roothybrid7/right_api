@@ -7,10 +7,10 @@ readonly COOKIES_NAME="${HOME}/.rsCookie"
 readonly API_VERSION=1.0
 readonly API_VERSION_HEADER="X-API-VERSION:${API_VERSION}"
 readonly API_BASEURI="https://my.rightscale.com/api/acct"
-readonly FORMAT="js"
 account_id=
 username=
 password=
+format=
 
 _usage() {
   if [ $# -eq 0 ]; then
@@ -22,6 +22,7 @@ Usage: $0 [options] [functions]
     -h : print this help message and exit
     -u <username> : Rightscale's username(use login)
     -p <password> : user password(optional)
+    -j <format_type> : Set response format(xml or js[json])
 
   Defined funtions:
     login :
@@ -46,6 +47,10 @@ _END_OF_USAGE
 
         arguments : <account_id>
           <account_id> : Rightscale's Account id(required)
+    format <format_type> :
+      Set response format.
+        arguments : <format_type>
+          <format_type> : Set response format(xml or js[json])
 
 _END_OF_USAGE
   fi
@@ -122,7 +127,14 @@ servers() {
   }
 
   local api="${API_BASEURI}/${account_id}/servers"
-  [ $# -ne 0 ] && api="${api}?filter=${1}"
+  [ $# -ne 0 ] && api+="?filter=${1}"
+  if [ -n "$format" ]; then
+    echo $api | grep '?' && {
+      api+="&format=$format"
+    } || {
+      api+="?format=$format"
+    }
+  fi
 
   curl -H $API_VERSION_HEADER -b $COOKIES_NAME $api
 
@@ -205,13 +217,14 @@ main() {
 # Entry point
 if [ $# -ne 0 ]; then
   # parse options
-  while getopts a:hu:p: OPT
+  while getopts a:hu:p:f: OPT
   do
     case $OPT in
       "a") account_id="$OPTARG";;
       "h") _usage; exit 0;;
       "u") username="$OPTARG";;
       "p") password="$OPTARG";;
+      "f") format="$OPTARG";;
       *) ;;
     esac
   done
