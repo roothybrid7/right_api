@@ -1,0 +1,24 @@
+require 'rubygems'
+require 'rake/gempackagetask'
+
+spec = Gem::Specification.new do |s|
+  s.platform = Gem::Platform::RUBY
+  s.summary = "RightAPI: Ruby API Wrapper."
+  s.name = 'RightAPI'
+  s.author = 'Satoshi Ohki'
+  s.email = 'satoshi@unoh.net'
+  s.version = '0.0.2'
+  s.requirements << 'none'
+  s.require_path = 'lib'
+  s.autorequire = 'rake'
+  s.files = FileList['README', 'LICENSE', 'lib/*.rb']
+  s.description = <<EOF
+RightScale Ruby API wrapper.
+see github: http://github.com/robertcarr/RightAPI
+EOF
+end
+
+Rake::GemPackageTask.new(spec) do |pkg|
+  pkg.need_zip = true
+  pkg.need_tar = true
+end
