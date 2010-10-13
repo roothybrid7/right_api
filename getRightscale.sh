@@ -1,6 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2010 ...
-# author: Satoshi OHKI<satoshi@unoh.net>
+# author: Satoshi Ohki <roothybrid7@gmail.com>
 
 # Declaration of variables
 readonly COOKIES_NAME="${HOME}/.rsCookie"
@@ -22,7 +21,7 @@ Usage: $0 [options] [functions]
     -h : print this help message and exit
     -u <username> : Rightscale's username(use login)
     -p <password> : user password(optional)
-    -j <format_type> : Set response format(xml or js[json])
+    -f <format_type> : Set response format(xml or js[json])
 
   Defined funtions:
     login :
