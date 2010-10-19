@@ -2,6 +2,35 @@
 # @author Satoshi Ohki
 
 module RightResource
+
+class connection
+  def initialize(vars)
+    @api = RightAPI.new
+  #  api.log_file = RSAPI_LOG
+  #  api.log = true
+
+    @api.login(
+      :username => vars[:username],
+      :password => vars[:password],
+      :account => vars[:account]
+    )
+  end
+
+  def send(path, opts={})
+    response = @api.send(path)
+    unless response
+      raise RightAPIError, "Failed to get RightScale info from RightScale API!!"
+    end
+
+    return response
+  rescue => e
+    $logger.debug(e.backtrace)
+    $logger.warn("FAILED: RightAPI:\n" + e)
+    raise
+  end
+end
+
+class Base
   # CRUD Operations
   def index(params={})
   end
