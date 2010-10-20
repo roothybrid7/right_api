@@ -2,35 +2,72 @@
 # @author Satoshi Ohki
 
 module RightResource
+end
 
-class connection
-  def initialize(vars)
-    @api = RightAPI.new
+module RightResource
+class Connection
+  def initialize(api, params={})
+    @api = api
   #  api.log_file = RSAPI_LOG
   #  api.log = true
-
-    @api.login(
-      :username => vars[:username],
-      :password => vars[:password],
-      :account => vars[:account]
-    )
   end
 
-  def send(path, opts={})
-    response = @api.send(path)
-    unless response
-      raise RightAPIError, "Failed to get RightScale info from RightScale API!!"
-    end
+  def login(params={})
+    @api.login(
+      :username => params[:username],
+      :password => params[:password],
+      :account => params[:account]
+    ) || #TODO: Exception "Not login!!"
+  end
 
-    return response
-  rescue => e
-    $logger.debug(e.backtrace)
-    $logger.warn("FAILED: RightAPI:\n" + e)
-    raise
+  def send(path, method="get", headers={})
+    response = @api.send(path, method, headers)
+  end
+
+  # show|index
+  def get(path, headers={})
+    @api.send(path, "get", headers)
+  end
+
+  # create
+  def post(path, headers={})
+    @api.send("", "post", params)
+  end
+
+  # update
+  def put(path, headers={})
+    @api.send("", "put", params)
+  end
+
+  # destory
+  def delete(path, headers={})
+    @api.send("", "delete", params)
+  end
+
+  def head
+    @api.headers || {}
   end
 end
 
 class Base
+  class << self
+    def connection
+      @connection = Connection.new(api, format)
+      @connection.login(:username => user, :password => pass, :account => account)
+    end
+    def headers
+    end
+    def element_path(id, prefix_options={}, query_options=nil)
+    end
+    def create(attributes={})
+      self.new(attributes)
+    end
+  end
+
+  def initialize
+    @user
+  end
+
   # CRUD Operations
   def index(params={})
   end
@@ -39,17 +76,22 @@ class Base
   end
 
   def create(params={})
+    connection.post(path, encode, self.class.headers) do |response|
+#      self.id = response.body
+    end
   end
 
   def update(id, params={})
+    connection.put(path, encode, self.class.headers)
   end
 
   def destroy(id)
+    connection.delete(path, self.class.headers)
   end
 end
 
 # Management API
-class Management
+class Management < Base
   def initialize(doc)
     @doc = doc
   end
