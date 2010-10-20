@@ -2,6 +2,7 @@
 # @author Satoshi Ohki
 
 require 'rubygems'
+require 'uri'
 require 'rest_client'
 
 module RightResource
