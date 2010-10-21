@@ -30,7 +30,7 @@ p c1.headers
 p c1.resource_id
 puts "Get RightScale API info: for json"
 res = c2.get("servers?filter=nickname=kff-mixi-db-001")
-puts res
+p res
 p c2.headers
 p c2.resource_id
 puts "Get RightScale API info: for xml"

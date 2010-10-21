@@ -35,24 +35,32 @@ module RightResource
 
     def send(path, method="get", headers={})
       raise "Not Login!!" unless self.login?
-#      if /\?(.*)$/ =~ path
-#        path = URI.encode("#{path}&format=#{@format}")
-#      else
-#        path = URI.encode("#{path}?format=#{@format}")
-#      end
+      if /\.(xml|js)\?/ =~ path
+        path = URI.encode(path)
+      elsif /\?(.*)$/ =~ path
+        path = URI.encode("#{path}&format=#{@format}")
+      else
+        path = URI.encode("#{path}?format=#{@format}")
+      end
       unless method.match(/(get|put|post|delete)/)
         raise "Invalid Action: get|put|post|delete only"
       end
+
       api_version = {:x_api_version => @api_version, :api_version => @api_version}
       @response = @api_object[path].send(method.to_sym, api_version.merge(headers))
       @headers = @response.headers ||= {}
       @resource_id = @headers[:location].match(/\d+$/) unless @headers[:location].nil?
 
-      JSON.parse(@response.body)
+      if @format == "xml"
+        @response.body
+      else
+        JSON.parse(@response.body)
+      end
     rescue => e
       STDERR.puts e.message
     end
 
+    # HTTP methods
     # show|index
     def get(path, headers={})
       self.send(path, "get", headers)

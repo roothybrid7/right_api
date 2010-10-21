@@ -30,13 +30,15 @@ p c1.headers
 p c1.resource_id
 puts "Get RightScale API info: for json"
 res = c2.get("servers/829430")
-puts res
+p res
+p res.class
 p c2.headers
 p c2.resource_id
 puts "Get RightScale API info: for xml"
 c2.format = "xml"
-res = c2.get("servers/838359")
+res = c2.get("servers/829430")
 puts res
+puts res.class
 p c2.headers
 p c2.resource_id
 
