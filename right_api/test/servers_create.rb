@@ -18,24 +18,31 @@ c1 = RightResource::Connection.new
 p c1.inspect
 c2 = RightResource::Connection.new(:format => "js")
 p c2.inspect
-#c1.login(login_params)
+c1.login(login_params)
 c2.login(login_params)
 p c2.inspect
-#res = c2.get("servers")
+#res = c2.post("servers")
 #puts res
-puts "Get RightScale API info: for xml(Default)"
-res = c1.get("servers?filter=nickname=kff-mixi-db-001")
+p = {
+  "cloud_id" => "4",
+  "server[nickname]" => "api_created",
+  "server[server_template_href]" => "https://my.rightscale.com/api/acct/22329/ec2_server_templates/76679",
+  "server[deployment_href]" => "https://my.rightscale.com/api/acct/22329/deployments/59855"
+}
+puts "post RightScale API info: for xml(Default)"
+res = c1.post("servers", p)
 puts res
 p c1.headers
 p c1.resource_id
-puts "Get RightScale API info: for json"
-res = c2.get("servers?filter=nickname=kff-mixi-db-001")
+exit 0
+puts "post RightScale API info: for json"
+res = c2.post("servers")
 puts res
 p c2.headers
 p c2.resource_id
-puts "Get RightScale API info: for xml"
+puts "post RightScale API info: for xml"
 c2.format = "xml"
-res = c2.get("servers?filter=nickname=kff-mixi-db-001")
+res = c2.post("servers")
 puts res
 p c2.headers
 p c2.resource_id

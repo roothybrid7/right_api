@@ -3,7 +3,9 @@
 
 require 'rubygems'
 require 'uri'
+require 'rexml/document'
 require 'rest_client'
+require 'json/pure'
 
 module RightResource
   class Connection
@@ -13,7 +15,7 @@ module RightResource
     def initialize(params={})
       @api_version = params[:version] ||= "1.0"
       @api = params[:api] ||= "https://my.rightscale.com/api/acct/"
-      @format = params[:format].nil? ? "xml" : params[:format]
+      @format = params[:format] ||= "xml"
     end
 
     def login(params={})
@@ -25,15 +27,19 @@ module RightResource
       @api_object = RestClient::Resource.new(@api, @username, @password)
     rescue => e
       STDERR.puts e.message
-      exit 0
+    end
+
+    def login?
+      @username.nil? ? false : true
     end
 
     def send(path, method="get", headers={})
-      if /\?(.*)$/ =~ path
-        path = URI.encode("#{path}&format=#{@format}")
-      else
-        path = URI.encode("#{path}?format=#{@format}")
-      end
+      raise "Not Login!!" unless self.login?
+#      if /\?(.*)$/ =~ path
+#        path = URI.encode("#{path}&format=#{@format}")
+#      else
+#        path = URI.encode("#{path}?format=#{@format}")
+#      end
       unless method.match(/(get|put|post|delete)/)
         raise "Invalid Action: get|put|post|delete only"
       end
@@ -42,10 +48,9 @@ module RightResource
       @headers = @response.headers ||= {}
       @resource_id = @headers[:location].match(/\d+$/) unless @headers[:location].nil?
 
-      @response.body
+      JSON.parse(@response.body)
     rescue => e
       STDERR.puts e.message
-      exit 0
     end
 
     # show|index
@@ -55,17 +60,17 @@ module RightResource
 
     # create
     def post(path, headers={})
-      self.send(path, "post", params)
+      self.send(path, "post", headers)
     end
 
     # update
     def put(path, headers={})
-      self.send(path, "put", params)
+      self.send(path, "put", headers)
     end
 
     # destory
     def delete(path, headers={})
-      self.send(path, "delete", params)
+      self.send(path, "delete", headers)
     end
   end
 end

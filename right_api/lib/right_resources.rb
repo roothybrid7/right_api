@@ -2,15 +2,20 @@
 # @author Satoshi Ohki
 
 require 'rubygems'
-require 'uri'
 require 'rest_client'
 
 module RightResource
-  class Base
+  class Base < Hash
     class << self
+      attr_accessor :instances
       def connection(refresh=false)
-        @connection = Connection.new(api, format) if refresh || @connection.nil?
-        @connection.login(:username => user, :password => pass, :account => account)
+        if defined?(@connection) || superclass == Object
+          @connection = Connection.new(params) if refresh || @connection.nil?
+          @connection.login(:username => user, :password => pass, :account => account)
+          @connection
+        else
+          superclass.connection
+        end
       end
       def headers
       end
@@ -19,40 +24,89 @@ module RightResource
       def create(attributes={})
         self.new(attributes)
       end
+      # CRUD Operations
+      # :all, :first, :last
+      # example: (servers)params = {
+      #   :filter => "private_ip_address=10.1.1.1"
+      #   :filter => "nickname=web-001"
+      # }
+      def index(params={})
+        path = "#{resource_name}#{format}#{query_string(params)}"
+        connection.get(path || [])
+      end
+
+      def show(id, params={})
+        @connection.get()
+  #      self.class.new
+      end
+
+      def format=(type)
+        self.class.format = type.sub("json", "js")
+        connection.format = format
+      end
+
+      def format
+        self.class.format || "xml"
+      end
+
+      def resource_name
+        self.class.name.downcase + "s"
+      end
+      def collection_path
+
+      end
+
+      def instantiate_collection(collection, prefix_option={})
+        collection.collect! {|record| instantiate_record(record, prefix_options)}
+      end
+
+      def instantiate_record(record, prefix_options={})
+        self.class.new(record)
+      end
+
+      def query_string(options)
+        query = ""
+        options.each do |key,value|
+          query << query.empty? ? "?#{key.to_s}=#{value}" : "&#{key.to_s}=#{value}"
+        end
+      end
     end
 
-    def initialize
-      @user
+    def initialize(attributes={})
+      @attributes = attributes
+      @id = connection.resource_id ||= attributes[:href]..match(/\d+$/)
     end
 
-    # CRUD Operations
-    def index(params={})
+    protected
+    def store
+      self.class.instances ||= []
+      self.class.instances << self
     end
 
-    def show(id, params={})
+    def connection(refresh=false)
+      self.class.connection(refresh)
     end
 
+    # get data and update
+    def update(id, params={})
+      @connection.put(path, encode, self.class.headers)
+    end
+
+    # get data and create(Clone)
     def create(params={})
-      connection.post(path, encode, self.class.headers) do |response|
+      @connection.post(path, encode, self.class.headers) do |response|
   #      self.id = response.body
       end
     end
 
-    def update(id, params={})
-      connection.put(path, encode, self.class.headers)
-    end
-
     def destroy(id)
-      connection.delete(path, self.class.headers)
+      @connection.delete(path, self.class.headers)
     end
   end
 
+
   # Management API
   class Management < Base
-    def initialize(doc)
-      @doc = doc
-    end
-
     attr_reader :doc
     include RightResource
     def id(data)
@@ -68,8 +122,6 @@ module RightResource
   end
 
   class Server < Management
-    attr_reader :created_at, :updated_at, :state, :server_type, :current_instance_href
-    attr_accessor :nickname, :href, :deployment_href, :server_template_href
   end
 
   class Status < Management
@@ -106,6 +158,9 @@ module RightResource
   end
 
   # Design API
+  class Design < Base
+  end
+
   class ServerTemplate < Design
   end
 
