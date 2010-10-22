@@ -5,12 +5,12 @@ require 'rubygems'
 require 'rest_client'
 
 module RightResource
-  class Base < Hash
+  class Base
     class << self
-      attr_accessor :instances
+      attr_accessor :instances, :user, :pass, :account, :format
       def connection(refresh=false)
         if defined?(@connection) || superclass == Object
-          @connection = Connection.new(params) if refresh || @connection.nil?
+          @connection = Connection.new(format) if refresh || @connection.nil?
           @connection.login(:username => user, :password => pass, :account => account)
           @connection
         else
@@ -31,29 +31,20 @@ module RightResource
       #   :filter => "nickname=web-001"
       # }
       def index(params={})
-        path = "#{resource_name}#{format}#{query_string(params)}"
+        path = "#{resource_name}.#{format}#{query_string(params)}"
         connection.get(path || [])
       end
 
       def show(id, params={})
-        @connection.get()
+        path = "#{resource_name}/#{id}.#{format}#{query_string(params)}"
+        connection.get(path || [])
   #      self.class.new
       end
 
-      def format=(type)
-        self.class.format = type.sub("json", "js")
-        connection.format = format
-      end
-
-      def format
-        self.class.format || "xml"
-      end
-
       def resource_name
-        self.class.name.downcase + "s"
+        self.to_s.split(/::/).last.to_s.downcase + "s"
       end
       def collection_path
-
       end
 
       def instantiate_collection(collection, prefix_option={})
@@ -74,7 +65,12 @@ module RightResource
 
     def initialize(attributes={})
       @attributes = attributes
-      @id = connection.resource_id ||= attributes[:href]..match(/\d+$/)
+      @id = connection.resource_id ||= attributes["href"].match(/\d+$/) if attributes["href"]
+      if attributes
+        attributes.each_pair do |key, value|
+          instance_variable_set('@' + key, value)
+        end
+      end
     end
 
     protected
@@ -103,76 +99,64 @@ module RightResource
       @connection.delete(path, self.class.headers)
     end
   end
+end
 
+# Management API
+class Management < RightResource::Base; end
 
-  # Management API
-  class Management < Base
-    attr_reader :doc
-    include RightResource
-    def id(data)
-      @doc.elements.each(root) do |elm|
-        if elm.elements['nickname'].text == name
-          yield elm.elements['nickname'].text, elm.elements['href'].text.match(/[0-9]+$/).to_s.to_i
-        end
-      end
-    end
-  end
+class Deployment < Management
+end
 
-  class Deployment < Management
-  end
+class Server < Management
+end
 
-  class Server < Management
-  end
+class Status < Management
+end
 
-  class Status < Management
-  end
+class AlertSpec < Management
+end
 
-  class AlertSpec < Management
-  end
+class Ec2EbsVolume < Management
+end
 
-  class Ec2EbsVolume < Management
-  end
+class Ec2EbsSnapshot < Management
+end
 
-  class Ec2EbsSnapshot < Management
-  end
+class Ec2ElasticIP < Management
+end
 
-  class Ec2ElasticIP < Management
-  end
+class Ec2SecurityGroup < Management
+end
 
-  class Ec2SecurityGroup < Management
-  end
+class Ec2SshKeys < Management
+end
 
-  class Ec2SshKeys < Management
-  end
+class ServerArray < Management
+end
 
-  class ServerArray < Management
-  end
+class S3Bucket < Management
+end
 
-  class S3Bucket < Management
-  end
+class Tag < Management
+end
 
-  class Tag < Management
-  end
+class VpcDhcpOption < Management
+end
 
-  class VpcDhcpOption < Management
-  end
+# Design API
+class Design < RightResource::Base; end
 
-  # Design API
-  class Design < Base
-  end
+class ServerTemplate < Design
+end
 
-  class ServerTemplate < Design
-  end
+class RightScript < Design
+end
 
-  class RightScript < Design
-  end
+class MultiCloudImage < Design
+end
 
-  class MultiCloudImage < Design
-  end
+class Macro < Design
+end
 
-  class Macro < Design
-  end
-
-  class Credential < Design
-  end
+class Credential < Design
 end
