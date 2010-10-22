@@ -16,7 +16,7 @@ auth_data.each_pair {|key,value| login_params[key.to_sym] = value}
 p login_params.inspect
 c1 = RightResource::Connection.new
 p c1.inspect
-c2 = RightResource::Connection.new(:format => "js")
+c2 = RightResource::Connection.new(format = "js")
 p c2.inspect
 #c1.login(login_params)
 c2.login(login_params)
@@ -31,6 +31,7 @@ p c1.resource_id
 puts "Get RightScale API info: for json"
 res = c2.get("servers?filter=nickname=kff-mixi-db-001")
 p res
+p c2.format
 p c2.headers
 p c2.resource_id
 puts "Get RightScale API info: for xml"

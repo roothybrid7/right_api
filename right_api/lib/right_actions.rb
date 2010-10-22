@@ -7,8 +7,7 @@ require 'rest_client'
 module RightResource
   class Base
     class << self
-      #attr_accessor :instances, :user, :pass, :account, :format
-      attr_accessor :instances
+      attr_accessor :instances, :user, :pass, :account, :format
       def connection(refresh=false)
         if defined?(@connection) || superclass == Object
           @connection = Connection.new(format) if refresh || @connection.nil?
@@ -18,18 +17,13 @@ module RightResource
           superclass.connection
         end
       end
-      def format=(type)
-        @format = type.to_s.sub("json", "js")
-      end
-      def format
-        @format || "xml"
-      end
       def headers
       end
       def element_path(id, prefix_options={}, query_options=nil)
-        "#{resource_name}#{prefix_path(prefix_options)}.#{format}#{query_string(query_options)}"
       end
-
+      def create(attributes={})
+        self.new(attributes)
+      end
       # CRUD Operations
       # :all, :first, :last
       # example: (servers)params = {
@@ -50,7 +44,6 @@ module RightResource
       def resource_name
         self.to_s.split(/::/).last.to_s.downcase + "s"
       end
-
       def collection_path
       end
 
