@@ -12,10 +12,10 @@ module RightResource
     attr_accessor :api_version, :log, :api, :format
     attr_reader :headers, :resource_id
 
-    def initialize(params={})
-      @api_version = params[:version] ||= "1.0"
-      @api = params[:api] ||= "https://my.rightscale.com/api/acct/"
-      @format = params[:format] ||= "xml"
+    def initialize(format)
+      @api_version = "1.0"
+      @api = "https://my.rightscale.com/api/acct/"
+      @format = format ||= "xml"
     end
 
     def login(params={})
