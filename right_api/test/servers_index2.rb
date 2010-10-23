@@ -78,10 +78,11 @@ end
 
 class Server < Base; end
 
+# Entry point
 servers = Server.index
-#p servers.size
-servers.each do |s|
-p "BEGIN Id: #{s.href.match(/\d+$/)} Nickname: #{s.nickname} -----"
+p servers.size
+servers.each_with_index do |s,i|
+p "BEGIN No: #{i}, Id: #{s.href.match(/\d+$/)} Nickname: #{s.nickname} -----"
   puts "State: #{s.state}"
   p s.attributes
 p "--------------------- END"

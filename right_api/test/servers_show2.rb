@@ -28,11 +28,13 @@ class Base
 
     def index(params={})
       path = "#{resource_name}.#{format}#{query_string(params)}"
-#p JSON.parse(connection.get(path))
       instantiate_collection(JSON.parse(connection.get(path || [])))
     end
 
     def show(id, params={})
+      path = "#{resource_name}/#{id}.#{format}#{query_string(params)}"
+      instantiate_record(JSON.parse(connection.get(path)))
+    end
 
     def resource_name
       self.name.split(/::/).last.to_s.downcase + "s"
@@ -56,10 +58,10 @@ class Base
     end
 
     def instantiate_collection(collection)
-      collection.collect! {|record| instantiates_record(record)}
+      collection.collect! {|record| instantiate_record(record)}
     end
 
-    def instantiates_record(record)
+    def instantiate_record(record)
       self.new(record)
     end
   end
@@ -80,15 +82,16 @@ end
 
 class Server < Base; end
 
-servers = Server.index
-#p servers.size
-servers.each do |s|
-p "BEGIN Id: #{s.href.match(/\d+$/)} Nickname: #{s.nickname} -----"
-  puts "State: #{s.state}"
-  p s.attributes
-p "--------------------- END"
-end
-servers 
+# Entry point
+server = Server.show("838755")
+p server
+exit 0
+#servers.each do |s|
+#p "BEGIN Id: #{s.href.match(/\d+$/)} Nickname: #{s.nickname} -----"
+#  puts "State: #{s.state}"
+#  p s.attributes
+#p "--------------------- END"
+#end
 
 puts "END OF SCRIPT"
 exit 0
