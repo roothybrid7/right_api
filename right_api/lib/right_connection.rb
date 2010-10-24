@@ -9,7 +9,7 @@ require 'json/pure'
 
 module RightResource
   class Connection
-    attr_accessor :api_version, :log, :api, :format
+    attr_accessor :api_version, :log, :api, :format, :username, :password, :account
     attr_reader :headers, :resource_id
 
     def initialize(format=nil)
@@ -19,12 +19,11 @@ module RightResource
     end
 
     def login(params={})
-      @username = params[:username]
-      @password = params[:password]
-      @account = params[:account]
+      @username = params[:username] unless params[:username].nil? || params[:username].empty?
+      @password = params[:password] unless params[:password].nil? || params[:password].empty?
+      @account = params[:account] unless params[:account].nil? || params[:account].empty?
 
-      @api = @api + @account
-      @api_object = RestClient::Resource.new(@api, @username, @password)
+      @api_object = RestClient::Resource.new("#{@api}#{@account}", @username, @password)
     rescue => e
       STDERR.puts e.message
     end
@@ -46,6 +45,7 @@ module RightResource
         raise "Invalid Action: get|put|post|delete only"
       end
       api_version = {:x_api_version => @api_version, :api_version => @api_version}
+
       @response = @api_object[path].send(method.to_sym, api_version.merge(headers))
       @headers = @response.headers ||= {}
       @resource_id = @headers[:location].match(/\d+$/) unless @headers[:location].nil?
