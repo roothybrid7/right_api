@@ -69,6 +69,9 @@ _END_OF_USAGE
         arguments : [<key>=<value>](filter)
             <filter> : Rightscale's parameter(optional)
 
+    alert_specs :
+        Listed Alert Specifications
+
     ec2_ebs_volumes :
         Listed ec2_ebs_volumes
 
@@ -197,6 +200,11 @@ deployments() {
 }
 
 servers() {
+  _open_url $FUNCNAME $*
+  return $?
+}
+
+alert_specs() {
   _open_url $FUNCNAME $*
   return $?
 }
