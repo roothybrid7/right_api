@@ -1,8 +1,0 @@
-RightScale Resource API wrapper
-
-Require packages
-    json
-    rest_client
-    crack
-
-install: sudo gem install json rest_client crack
